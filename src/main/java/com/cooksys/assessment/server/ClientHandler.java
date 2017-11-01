@@ -43,6 +43,12 @@ public class ClientHandler implements Runnable {
 
 				switch (message.getCommand()) {
 					case "connect":
+						if(peop.findPerson(message.getUsername()) != -1) {
+							
+							writer.write(mapper.writeValueAsString(new Message("System", "The server already contains a user named " + message.getUsername() + "! Please connect with a different username!")));
+							writer.flush();
+							socket.close();
+						}
 						log.info("<{}>: user <{}> connected",message.getDate(), message.getUsername());
 						myLocation = peop.addAUser(message.getUsername());
 						writer.flush();
@@ -50,6 +56,8 @@ public class ClientHandler implements Runnable {
 						break;
 					case "disconnect":
 						log.info("<{}>: user <{}> disconnected", message.getDate(),message.getUsername());
+						peop.removeUser(message.getUsername());
+						peop.sendBroadcast(new Message(message.getUsername(), " has disconnected :("));
 						this.socket.close();
 						fwd.stopMe();
 						break;
@@ -57,17 +65,21 @@ public class ClientHandler implements Runnable {
 						peop.sendBroadcast(message);
 						log.info("<{}>: user <{}> broadcasts ", message.getDate(), message.getUsername());
 						break;
-					case "@":
-						log.info("<{}>: user <{}> says to one person",message.getDate(), message.getUsername());
+					case "at":
+						log.info("<{}>: user <{}> says to <{}>",message.getDate(), message.getUsername(),message.getContents().split(" ")[0]);
+						Message a = new Message(message.getUsername(),message.getContents().replaceAll(message.getContents().split(" ")[0], ""));
+						a.setCommand("at");
+						peop.sendMessageToOne(a, message.getContents().split(" ")[0]);
+						writer.flush();
 						break;
 					case "users":
 						log.info("<{}>: Said users!", message.getDate());
+						peop.sendMessage(new Message(message.getUsername(),peop.getUsers()), message.getUsername());
+						writer.flush();
 						break;
 					case "echo":
 						log.info("<{}>: user <{}> echoed message <{}>",message.getDate(), message.getUsername(), message.getContents());
 						peop.sendMessage(message, message.getUsername());
-						String response = mapper.writeValueAsString(message);
-						writer.write(response);
 						writer.flush();
 						break;
 				}

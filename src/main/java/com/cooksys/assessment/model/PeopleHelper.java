@@ -33,6 +33,11 @@ public class PeopleHelper {
 		return true;
 	}
 	
+	public void sendMessageToOne(Message m, String to) {
+		if(!sendMessage(m,to)) {
+			sendMessage(new Message("System","Your message to " + to + " failed! No such user exists!"),m.getUsername());
+		}
+	}
 	public synchronized void sendBroadcast(Message m) {
 		for(int x = 0; x < people.size(); x++) {
 			people.get(x).sendBroadcast(m);
@@ -43,16 +48,26 @@ public class PeopleHelper {
 	public int addAUser(String name) {
 		people.add(new People(name));
 		int numToReturn = people.size() - 1;
-		sendBroadcast(new Message(name, String.format("<%s>: %s has joined the party!", Message.getCurrentDate(),name)));
+		sendBroadcast(new Message("Server", String.format("<%s> has joined the party!",name)));
 		return numToReturn;
 	}
 	
-	private int findPerson(String name) {
+	public String getUsers() {
+		String build = "List of users connected as of " + Message.getCurrentDate() + "\n";
+		for(int x = 0; x < people.size(); x++)
+			build += people.get(x).getName() + "\n";
+		return build;
+	}
+	
+	public int findPerson(String name) {
 		for(int x = 0; x < people.size(); x++) {
 			if (people.get(x).getName().equals(name))
 				return x;
 		}
 		return -1;
+	}
+	public void removeUser(String name) {
+		people.remove(findPerson(name));
 	}
 	
 }

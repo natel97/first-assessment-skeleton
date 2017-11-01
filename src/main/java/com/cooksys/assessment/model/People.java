@@ -36,7 +36,6 @@ public class People {
 	public void sendMessage(Message m) {
 		_messagePending = m;
 		_pendingMessage = true;
-		log.info("Message is to be sent!");
 	}
 	
 	public boolean messagePending() {

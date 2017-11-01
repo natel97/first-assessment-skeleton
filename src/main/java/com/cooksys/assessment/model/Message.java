@@ -14,13 +14,14 @@ public class Message {
 		this.date = getCurrentDate();
 		this.username = username;
 		this.contents = content;
+		this.command = "users";
 	}
 	public Message() {
 		super();
 	}
 	
 	public static String getCurrentDate() {
-		return new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
+		return new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date());
 	}
 
 	public String getDate() {

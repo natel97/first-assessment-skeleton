@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 
 import com.cooksys.assessment.model.Message;
 import com.cooksys.assessment.model.PeopleHelper;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class MessageForwarder implements Runnable{
@@ -42,16 +41,15 @@ public class MessageForwarder implements Runnable{
 	public void run() {
 				
 		while(keepGoing) {
-			//log.info(String.valueOf(keepGoing));
 			if (people.checkForMessages(myChild)){
-				log.info("I have a message!");
 				Message message = people.getMessages(myChild);
 				String m;
 				try {
 					m = mapper.writeValueAsString(message);
 					writer.write(m);
 					writer.flush();
-				} catch (JsonProcessingException e) {
+					Thread.sleep(100);
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}

@@ -13,7 +13,7 @@ export class Message {
     this.contents = contents
     this.lastCommand = "echo"
     let a = new Date
-    this.date = `${a.getMonth()}/${a.getDate()}/${a.getYear() - 100}  -  ${a.getHours()}:${a.getMinutes()}:${a.getSeconds()}:${a.getMilliseconds()}`
+    this.date = `${a.getMonth()}/${a.getDate()}/${a.getYear() - 100}-${a.getHours()}:${a.getMinutes()}:${a.getSeconds()}:${a.getMilliseconds()}`
   }
 
   toJSON() {
@@ -26,6 +26,22 @@ export class Message {
   }
 
   toString() {
-    return this.contents
+    let mes;
+    if (this.command === "at") {
+      this.username = "<" + this.username + ">"
+      mes = "(whisper):";
+    } else
+    if (this.command === "broadcast") {
+      this.username = "<" + this.username + ">"
+      mes = "(all):";
+    } else
+    if (this.command === "echo") {
+      this.username = "<" + this.username + ">"
+      mes = "(echo):";
+    } else {
+      this.username = "";
+      mes = ""
+    }
+    return "{" + this.date + "}: " + this.username + " " + mes + " " + this.contents;
   }
 }

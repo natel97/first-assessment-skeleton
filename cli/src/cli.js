@@ -20,7 +20,7 @@ cli
 
 cli
   .mode('connect <username>')
-  .delimiter(cli.chalk['green']('connected>'))
+  .delimiter(cli.chalk['green']('<connected>'))
   .init(function(args, callback) {
     username = args.username
     server = connect({
@@ -64,12 +64,18 @@ cli
         contents
       }).toJSON() + '\n')
     } else if (command === 'users') {
-      this.log("connected users: YOU")
-    }
-    //else if (command.startsWith("@")) {
-    //  this.log("Sending message to " + command)
-    //}
-    else {
+      server.write(new Message({
+        username,
+        command,
+        contents
+      }).toJSON() + '\n')
+    } else if (input.startsWith("@")) {
+      server.write(new Message({
+        username,
+        command: "at",
+        contents: command + " " + contents
+      }).toJSON() + "\n")
+    } else {
       this.log(`Command <${command}> was not recognized`)
     }
 
