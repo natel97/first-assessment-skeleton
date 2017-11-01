@@ -11,7 +11,7 @@ public class Message {
 	private String date;
 	
 	public Message(String username, String content) {
-		setDate(null);
+		this.date = getCurrentDate();
 		this.username = username;
 		this.contents = content;
 	}
@@ -19,10 +19,8 @@ public class Message {
 		super();
 	}
 	
-	private void setDate(String date) {
-		this.date = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
-		if (date == null)
-			this.date = date;
+	public static String getCurrentDate() {
+		return new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
 	}
 
 	public String getDate() {

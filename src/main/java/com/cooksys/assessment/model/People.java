@@ -3,8 +3,11 @@ package com.cooksys.assessment.model;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 public class People {
-	private int _ID;
 	private String _name;
 	private String _dateConnected;
 	private boolean _pendingMessage;
@@ -12,13 +15,14 @@ public class People {
 	private boolean _hasBroadcast;
 	private Message _pendingBroadcast;
 	private String _lastCommand;
+	private Logger log = LoggerFactory.getLogger(People.class);
+
 	
-	public People(String name, int ID) {
+	public People(String name) {
 		this._name = name;
 		this._dateConnected = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss").format(LocalDateTime.now());
 		this._pendingMessage = false;	
 		this._hasBroadcast = false;
-		this._ID = ID;
 	}
 	
 	public String getName() {
@@ -32,6 +36,7 @@ public class People {
 	public void sendMessage(Message m) {
 		_messagePending = m;
 		_pendingMessage = true;
+		log.info("Message is to be sent!");
 	}
 	
 	public boolean messagePending() {
@@ -39,6 +44,7 @@ public class People {
 	}
 	
 	public Message readMessage() {
+		log.info("Message has been read!");
 		_pendingMessage = false;
 		return _messagePending;
 	}
@@ -62,8 +68,5 @@ public class People {
 	public Message getBroadcast() {
 		_hasBroadcast = false;
 		return _pendingBroadcast;
-	}
-	public int getID() {
-		return _ID;
 	}
 }
