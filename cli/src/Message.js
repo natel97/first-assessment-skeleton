@@ -29,7 +29,7 @@ export class Message {
     let mes;
     if (this.command === "at") {
       this.username = "<" + this.username + ">"
-      mes = "(whisper):";
+      mes = chalk.red("(whisper):");
     } else
     if (this.command === "broadcast") {
       this.username = "<" + this.username + ">"

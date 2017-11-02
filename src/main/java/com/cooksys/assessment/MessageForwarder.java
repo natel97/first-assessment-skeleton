@@ -13,22 +13,21 @@ public class MessageForwarder implements Runnable{
 	
 	private boolean keepGoing;
 	private PeopleHelper people;
-	int myChild;
+	String myChild;
 	PrintWriter writer;
 	Thread myThread;
 
 	private Logger log = LoggerFactory.getLogger(MessageForwarder.class);
 	ObjectMapper mapper;
 	
-	public MessageForwarder(PeopleHelper h, int toListenFor, ObjectMapper o, PrintWriter p) {
+	public MessageForwarder(PeopleHelper h, String name, ObjectMapper o, PrintWriter p) {
 		keepGoing = true;
 		people = h;
-		myChild = toListenFor;
+		myChild = name;
 		mapper = o;
 		writer = p;
 		this.myThread = new Thread(this);
 		myThread.start();
-		log.info(people.toString());
 		
 	}
 	
@@ -41,9 +40,12 @@ public class MessageForwarder implements Runnable{
 	public void run() {
 				
 		while(keepGoing) {
-			if (people.checkForMessages(myChild)){
-				Message message = people.getMessages(myChild);
+			if (people.checkForMessages(people.findPerson(myChild))){
+				if(people.findPerson(myChild) == -1)
+					break;
+				Message message = people.getMessages(people.findPerson(myChild));
 				String m;
+				
 				try {
 					m = mapper.writeValueAsString(message);
 					writer.write(m);

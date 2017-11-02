@@ -19,7 +19,7 @@ public class ClientHandler implements Runnable {
 	private Logger log = LoggerFactory.getLogger(ClientHandler.class);
 	public PeopleHelper peop;
 	private Socket socket;
-	private int myLocation = -1;
+	private String myName = "nobody";
 	private MessageForwarder fwd;
 
 	public ClientHandler(Socket socket, PeopleHelper people) {
@@ -48,16 +48,18 @@ public class ClientHandler implements Runnable {
 							writer.write(mapper.writeValueAsString(new Message("System", "The server already contains a user named " + message.getUsername() + "! Please connect with a different username!")));
 							writer.flush();
 							socket.close();
+							break;
 						}
 						log.info("<{}>: user <{}> connected",message.getDate(), message.getUsername());
-						myLocation = peop.addAUser(message.getUsername());
+						myName =message.getUsername();
+						peop.addAUser(myName);
 						writer.flush();
-						fwd = new MessageForwarder(peop,myLocation,mapper,writer);
+						fwd = new MessageForwarder(peop,myName,mapper,writer);
 						break;
 					case "disconnect":
 						log.info("<{}>: user <{}> disconnected", message.getDate(),message.getUsername());
+						peop.sendBroadcast(new Message(message.getUsername(), message.getUsername() + " has disconnected :("));
 						peop.removeUser(message.getUsername());
-						peop.sendBroadcast(new Message(message.getUsername(), " has disconnected :("));
 						this.socket.close();
 						fwd.stopMe();
 						break;
