@@ -13,7 +13,7 @@ export const cli = vorpal()
 
 let username
 let server
-let lastCommand
+var lastCommand = "broadcast"
 
 cli
   .delimiter(cli.chalk['yellow']('ftd~$'))
@@ -62,8 +62,17 @@ cli
   })
   .action(function(input, callback) {
     let [command, ...rest] = words(input)
-    const contents = rest.join(' ')
-
+    let contents = rest.join(' ')
+    if (!(command === "disconnect" || command === "echo" || command === "broadcast" || command === "users" || input.startsWith("@"))) {
+      if (global.lastCommand != undefined) {
+        contents = command + " " + contents
+        command = global.lastCommand;
+        if (global.lastCommand.startsWith("at")) {
+          input = "@" + input
+          command = global.lastCommand.split(" ")[1]
+        }
+      }
+    }
     if (command === 'disconnect') {
       server.end(new Message({
         username,
@@ -94,8 +103,10 @@ cli
         command: "at",
         contents: command + " " + contents
       }).toJSON() + "\n")
+      command = "at " + command
     } else {
-      this.log(`Command <${command}> was not recognized, last command <${lastCommand}>`)
+      this.log(`Command <${command}> was not recognized, last command <${global.lastCommand}>`)
     }
+    global.lastCommand = command;
     callback()
   })
