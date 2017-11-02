@@ -35,9 +35,7 @@ public class ClientHandler implements Runnable {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			PrintWriter writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
 
-			while (!socket.isClosed()) {	
-				
-				
+			while (!socket.isClosed()) {					
 				String raw = reader.readLine();
 				Message message = mapper.readValue(raw, Message.class);
 
@@ -81,6 +79,9 @@ public class ClientHandler implements Runnable {
 						break;
 					case "echo":
 						log.info("<{}>: user <{}> echoed message <{}>",message.getDate(), message.getUsername(), message.getContents());
+						if(message.getContents().startsWith("guess ")) {
+							peop.guessLetter(String.valueOf(message.getContents().charAt(6)), message.getUsername(), 0);
+						}
 						peop.sendMessage(message, message.getUsername());
 						writer.flush();
 						break;

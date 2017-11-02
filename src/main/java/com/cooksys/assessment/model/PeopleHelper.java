@@ -8,14 +8,26 @@ import org.slf4j.LoggerFactory;
 
 
 
+
 public class PeopleHelper {
 
 	private List<People> people = new LinkedList<>();
 	private Logger log = LoggerFactory.getLogger(PeopleHelper.class);
+	private List<HangMan> games = new LinkedList<>();
 
 	
 	public synchronized boolean checkForMessages(int id) {
 		return(people.get(id).pendingBroadcast() || people.get(id).messagePending());
+	}
+	
+	public synchronized void addGame(String user) {
+		HangMan h = new HangMan();
+		h.addPerson(user);
+		games.add(h);
+	}
+	
+	public boolean guessLetter(String letter, String name, int game) {
+		return games.get(game).guess(name, letter);
 	}
 	
 	public synchronized Message getMessages(int id) {
