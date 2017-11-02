@@ -14,11 +14,14 @@ public class HangMan {
 	private String _progress = "";
 	private String[] manParts = {"_", "_", "_", "|","o", "/", "|", "\\", "|", "/", "\\"};
 	private String[] myParts = new String[] {"", "", "", "", "", "", "", "", "", "", "", ""};
+	public boolean gameOver = false;
+	public boolean win = false;
 	
 	public void setHint(String hint){
 		_hint = hint;
 	}
 	public void setSolution(String sol) {
+		sol = sol.toUpperCase();
 		String build = "";
 		for(int x = 0; x < sol.length(); x++) {
 			if(sol.charAt(x) != ' ') {
@@ -31,7 +34,7 @@ public class HangMan {
 		_progress = build;
 		_solution = sol;
 	}
-	public void addPerson(String person) {
+	public synchronized void addPerson(String person) {
 		_people.add(person);
 	}
 	
@@ -76,6 +79,13 @@ public class HangMan {
 		return true;
 	}
 	public String redraw() {
+		if(_misses.length() > 11) {
+			this.gameOver = true;
+		}
+		if(_progress.equals(_solution)) {
+			this.win = true;
+		}
+		
 		for(int x = 0; x < manParts.length; x++) {
 			if(x < _misses.length())
 				myParts[x] = manParts[x];

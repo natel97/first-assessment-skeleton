@@ -29,26 +29,56 @@ public class PeopleHelper {
 	
 	public synchronized void setGameDetails(int game, String hint, String solution, String[] peeople) {
 		games.get(game).setHint(hint);
+		log.info("Setting game details!");
 		games.get(game).setSolution(solution);
 		for(int x = 0; x < peeople.length; x++) {
-			games.get(game).addPerson(peeople[x]);
-			people.get(findPerson(peeople[x])).addToGame(game);
+			addToGame(peeople[x], game);
+			log.info("Sending game to " + peeople[x]);
 		}
 	}
 	
-	public void addToGame(String name, int game) {
+	public synchronized boolean addToGame(String name, int game) {
+		if(findPerson(name) == -1)
+			return false;
+		log.info("Adding " + name + " to the game!");
 		games.get(game).addPerson(name);
+		people.get(findPerson(name)).addToGame(game);
 		people.get(findPerson(name)).sendMessage(new Message("HangMan", "You have been drafted into playing hangman! Have fun!!"));
+		return true;
 	}
 	
 	public void redraw(int game) {
 		LinkedList<String> peop = (LinkedList<String>) games.get(game).getPeople();
 		for(int x = 0; x < peop.size(); x++) {
-			this.sendMessage(new Message("HangMan", games.get(game).redraw()), peop.get(x));
+			if(getGame(peop.get(x)) != -1)
+				this.sendMessage(new Message("HangMan", games.get(game).redraw()), peop.get(x));
+		if(games.get(game).gameOver) {
+			shift(game);
+			for(x = 0; x < games.get(game).getPeople().size(); x++) {
+				people.get(findPerson(games.get(game).getPeople().get(x))).removeFromGames();
+				people.get(findPerson(games.get(game).getPeople().get(x))).sendMessage(new Message("HangMan", "You have lost the game!!"));
+			}
+			games.remove(game);
+		}
+		if(games.get(game).win) {
+			shift(game);
+			for(x = 0; x < games.get(game).getPeople().size(); x++) {
+				people.get(findPerson(games.get(game).getPeople().get(x))).removeFromGames();
+				people.get(findPerson(games.get(game).getPeople().get(x))).sendMessage(new Message("HangMan", "You have won the game!!"));
+			}
+			games.remove(game);
+		}
+		}
+	}
+	
+	public void shift(int y) {
+		for(int x = 0; x < people.size(); x++) {
+			people.get(x).shift(y);
 		}
 	}
 	
 	public boolean guessLetter(String letter, String name, int game) {
+		letter = letter.toUpperCase().split("")[0];
 		if(game >= games.size())
 			return false;
 		return games.get(game).guess(name, letter);
@@ -98,7 +128,11 @@ public class PeopleHelper {
 		return build;
 	}
 	
-	public int findPerson(String name) {
+	public void resetGameForUser(String user) {
+		people.get(this.findPerson(user)).removeFromGames();
+	}
+	
+	public synchronized int findPerson(String name) {
 		for(int x = 0; x < people.size(); x++) {
 			if (people.get(x).getName().equals(name))
 				return x;

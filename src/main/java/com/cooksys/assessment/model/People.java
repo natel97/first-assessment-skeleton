@@ -14,7 +14,6 @@ public class People {
 	private Message _messagePending;
 	private boolean _hasBroadcast;
 	private Message _pendingBroadcast;
-	private String _lastCommand;
 	private int currentGame = -1;
 	private Logger log = LoggerFactory.getLogger(People.class);
 
@@ -26,16 +25,23 @@ public class People {
 		this._hasBroadcast = false;
 	}
 	
+	public void shift(int x) {
+		currentGame = x > currentGame ? currentGame : currentGame - 1;
+	}
 	public int getGame() {
+		log.info("Game of " + _name + "is being requested.. current value " + String.valueOf(currentGame));
 		return currentGame;
 	}
 	
 	public void addToGame(int game){
-		if(currentGame == -1)
+		if(currentGame == -1) {
 			currentGame = game;
+			log.info("Game of " + _name + " has been set to " + String.valueOf(game));
+		}
 	}
 	
 	public void removeFromGames() {
+		log.info("Game of " + _name + " has been reset");
 		currentGame = -1;
 	}
 	
@@ -48,6 +54,7 @@ public class People {
 	}
 	
 	public void sendMessage(Message m) {
+		log.info("Message being sent to " + _name);
 		_messagePending = m;
 		_pendingMessage = true;
 	}
@@ -61,14 +68,8 @@ public class People {
 		_pendingMessage = false;
 		return _messagePending;
 	}
-	
-	public void setLastCommand(String cmd) {
-		_lastCommand = cmd;
-	}
-	
-	public String getLastCommand() {
-		return _lastCommand;
-	}
+
+
 	
 	public boolean pendingBroadcast() {
 		return _hasBroadcast;

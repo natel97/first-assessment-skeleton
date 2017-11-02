@@ -38,7 +38,6 @@ public class ClientHandler implements Runnable {
 			while (!socket.isClosed()) {					
 				String raw = reader.readLine();
 				Message message = mapper.readValue(raw, Message.class);
-
 				switch (message.getCommand()) {
 					case "connect":
 						if(peop.findPerson(message.getUsername()) != -1) {
@@ -78,6 +77,10 @@ public class ClientHandler implements Runnable {
 						writer.flush();
 						break;
 					case "echo":
+						if(message.getContents().equals("end game")) {
+							peop.resetGameForUser(message.getUsername());
+							peop.sendMessage(new Message("GameManager", "You have been successfully removed from the game!"), message.getUsername());
+						}
 						log.info("<{}>: user <{}> echoed message <{}>",message.getDate(), message.getUsername(), message.getContents());
 						if(message.getContents().startsWith("Hang Man")){
 							Message errMSG = new Message("HangMan System", "Please format your hangman starting message in the following format: HangMan HM My Answer HM My Hint HM People to invite separated by a space");
@@ -93,10 +96,13 @@ public class ClientHandler implements Runnable {
 						if(message.getContents().startsWith("guess ") && peop.getGame(message.getUsername())!= -1  && message.getContents().length() > 6) {
 							if(peop.guessLetter(message.getContents().split(" ")[1], message.getUsername(), peop.getGame(message.getUsername()))) {
 								peop.sendMessage(new Message("HangMan", "You have successfully guessed!"), message.getUsername());
+								log.info(message.getUsername() + " has made a guess... he guessed " + message.getContents().split(" ")[1]);
 							}
 								else {
 									peop.sendMessage(new Message("HangMan", "Your letter was already guessed!"), message.getUsername());
+									log.info(message.getUsername() + " guessed for a letter that was already guessed! hahaha");
 								}
+							log.info("Sending request to refresh game!");
 							peop.redraw(peop.getGame(message.getUsername()));
 							writer.flush();
 							break;

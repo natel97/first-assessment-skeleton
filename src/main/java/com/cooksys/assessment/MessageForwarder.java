@@ -40,9 +40,16 @@ public class MessageForwarder implements Runnable{
 	public void run() {
 				
 		while(keepGoing) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			if(people.findPerson(myChild) == -1) {
+				continue;
+			}
 			if (people.checkForMessages(people.findPerson(myChild))){
-				if(people.findPerson(myChild) == -1)
-					break;
 				Message message = people.getMessages(people.findPerson(myChild));
 				String m;
 				
