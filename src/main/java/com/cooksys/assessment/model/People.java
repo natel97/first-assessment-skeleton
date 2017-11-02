@@ -15,6 +15,7 @@ public class People {
 	private boolean _hasBroadcast;
 	private Message _pendingBroadcast;
 	private String _lastCommand;
+	private int currentGame = -1;
 	private Logger log = LoggerFactory.getLogger(People.class);
 
 	
@@ -23,6 +24,19 @@ public class People {
 		this._dateConnected = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss").format(LocalDateTime.now());
 		this._pendingMessage = false;	
 		this._hasBroadcast = false;
+	}
+	
+	public int getGame() {
+		return currentGame;
+	}
+	
+	public void addToGame(int game){
+		if(currentGame == -1)
+			currentGame = game;
+	}
+	
+	public void removeFromGames() {
+		currentGame = -1;
 	}
 	
 	public String getName() {

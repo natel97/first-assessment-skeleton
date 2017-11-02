@@ -79,9 +79,28 @@ public class ClientHandler implements Runnable {
 						break;
 					case "echo":
 						log.info("<{}>: user <{}> echoed message <{}>",message.getDate(), message.getUsername(), message.getContents());
-						if(message.getContents().startsWith("guess ")) {
-							peop.guessLetter(String.valueOf(message.getContents().charAt(6)), message.getUsername(), 0);
+						if(message.getContents().startsWith("Hang Man")){
+							Message errMSG = new Message("HangMan System", "Please format your hangman starting message in the following format: HangMan HM My Answer HM My Hint HM People to invite separated by a space");
+							String[] contents = message.getContents().split(" HM ");
+							if(!contents[0].equals("Hang Man") || contents.length != 4) {
+								peop.sendMessage(errMSG, message.getUsername());
+								writer.flush();
+								break;
+							}
+							peop.setGameDetails(peop.addGame(message.getUsername()), contents[2], contents[1], contents[3].split(" "));
 						}
+						
+						if(message.getContents().startsWith("guess ") && peop.getGame(message.getUsername())!= -1  && message.getContents().length() > 6) {
+							if(peop.guessLetter(message.getContents().split(" ")[1], message.getUsername(), peop.getGame(message.getUsername()))) {
+								peop.sendMessage(new Message("HangMan", "You have successfully guessed!"), message.getUsername());
+							}
+								else {
+									peop.sendMessage(new Message("HangMan", "Your letter was already guessed!"), message.getUsername());
+								}
+							peop.redraw(peop.getGame(message.getUsername()));
+							writer.flush();
+							break;
+							}
 						peop.sendMessage(message, message.getUsername());
 						writer.flush();
 						break;

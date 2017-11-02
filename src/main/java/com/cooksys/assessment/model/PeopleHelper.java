@@ -20,14 +20,41 @@ public class PeopleHelper {
 		return(people.get(id).pendingBroadcast() || people.get(id).messagePending());
 	}
 	
-	public synchronized void addGame(String user) {
+	public synchronized int addGame(String user) {
 		HangMan h = new HangMan();
 		h.addPerson(user);
 		games.add(h);
+		return games.size() - 1;
+	}
+	
+	public synchronized void setGameDetails(int game, String hint, String solution, String[] peeople) {
+		games.get(game).setHint(hint);
+		games.get(game).setSolution(solution);
+		for(int x = 0; x < peeople.length; x++) {
+			games.get(game).addPerson(peeople[x]);
+			people.get(findPerson(peeople[x])).addToGame(game);
+		}
+	}
+	
+	public void addToGame(String name, int game) {
+		games.get(game).addPerson(name);
+		people.get(findPerson(name)).sendMessage(new Message("HangMan", "You have been drafted into playing hangman! Have fun!!"));
+	}
+	
+	public void redraw(int game) {
+		LinkedList<String> peop = (LinkedList<String>) games.get(game).getPeople();
+		for(int x = 0; x < peop.size(); x++) {
+			this.sendMessage(new Message("HangMan", games.get(game).redraw()), peop.get(x));
+		}
 	}
 	
 	public boolean guessLetter(String letter, String name, int game) {
+		if(game >= games.size())
+			return false;
 		return games.get(game).guess(name, letter);
+	}
+	public int getGame(String person) {
+		return people.get(findPerson(person)).getGame();
 	}
 	
 	public synchronized Message getMessages(int id) {

@@ -5,15 +5,15 @@ import java.util.List;
 
 public class HangMan {
 	
-	List<String> _people = new LinkedList<>();
-	int[] scores;
-	String _hint;
-	String _solution;
-	String _guesses;
-	String _misses;
-	String _progress;
-	String[] manParts = {"_", "_", "_", "|","o", "/", "|", "\\", "|", "/", "\\"};
-	String[] myParts;
+	private List<String> _people = new LinkedList<>();
+	private int[] scores = new int[] {};
+	private String _hint = "";
+	private String _solution = "";
+	private String _guesses = "";
+	private String _misses = "";
+	private String _progress = "";
+	private String[] manParts = {"_", "_", "_", "|","o", "/", "|", "\\", "|", "/", "\\"};
+	private String[] myParts = new String[] {"", "", "", "", "", "", "", "", "", "", "", ""};
 	
 	public void setHint(String hint){
 		_hint = hint;
@@ -24,12 +24,19 @@ public class HangMan {
 			if(sol.charAt(x) != ' ') {
 				build += "_";
 			}
+			else {
+				build += " ";
+			}
 		}
 		_progress = build;
 		_solution = sol;
 	}
 	public void addPerson(String person) {
 		_people.add(person);
+	}
+	
+	public List<String> getPeople() {
+		return _people;
 	}
 	
 	public boolean personIsInvited(String person) {
@@ -43,13 +50,24 @@ public class HangMan {
 		if(_guesses.contains(a))
 			return false;
 		if(_solution.contains(a)) {
+			String prog = "";
 			String[] solution = _solution.split("");
 			String[] progress = _progress.split("");
 			for(int x = 0; x < _solution.length(); x++) {
-				if(solution[x] == a) {
-					progress[x] = a;
+				if(solution[x].equals(a)) {
+					prog += solution[x];
 				}
+				else if(solution[x].equals(" ")) {
+					prog += " ";
+				}
+				else if (!progress[x].equals("_")) {
+					prog += progress[x];
+				}
+				else
+					prog += "_";
 			}
+			_progress = prog;
+			_guesses += a;
 		}
 		else {
 			_misses += a;
@@ -66,18 +84,18 @@ public class HangMan {
 			}
 		}
 		
-		return String.format(""
+		return String.format("\n"
   + "   _%s%s%s\r\n" + 
 	"  |    %s         \n" + 
 	"  |    %s      Guessed : %s\n" + 
-	"  |   $s%s%s     \n" + 
+	"  |   %s%s%s      Missed : %s\n" + 
 	"  |    %s\r\n" + 
-	"  |   %s%s\r\n" + 
+	"  |    %s%s\r\n" + 
 	" _|_\r\n" + 
 	"|   |______\r\n" + 
 	"|          |\r\n" + 
 	"|__________|\r\n" + 
-	" \n\nHint: %s \nStatus: %s", _guesses, myParts[0], myParts[1], myParts[2], myParts[3], myParts[4], _guesses, myParts[5], myParts[6], myParts[7], myParts[8], myParts[9], myParts[10], _hint, _progress);
+	" \n\nHint: %s \nStatus: %s", myParts[0], myParts[1], myParts[2], myParts[3], myParts[4], _guesses,  myParts[5], myParts[6], myParts[7], _misses, myParts[8], myParts[9], myParts[10], _hint, _progress);
 		
 	}
 }
